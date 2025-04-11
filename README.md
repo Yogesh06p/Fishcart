@@ -46,7 +46,7 @@
     <img src="https://via.placeholder.com/100" alt="Bangda" />
     <h3>Bangda</h3>
     <p>₹300 / kg</p>
-    <a class="btn" href="https://wa.me/919999999999">Order on WhatsApp</a>
+    <a class="btn" href="https://wa.me/919664239863">Order on WhatsApp</a>
   </div>
 
   <div class="fish-item clearfix">
