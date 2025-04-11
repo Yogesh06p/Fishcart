@@ -41,14 +41,14 @@
 <body>
 
   <h1>Fishcart – Order Fresh Fish</h1>
-  <p>Select fish and enter quantity in gram or kg:</p>
+  <p>Select fish and enter quantity (gram or kg):</p>
 
   <form id="fishForm">
 
     <div class="fish-item">
       <input type="checkbox" id="surmai" name="fish" value="Surmai" data-price="800">
       <label for="surmai">Surmai – ₹800/kg</label>
-      <input type="number" min="1" placeholder="qty" id="qty-surmai">
+      <input type="number" min="1" id="qty-surmai">
       <select class="unit" id="unit-surmai">
         <option value="kg">kg</option>
         <option value="g">g</option>
@@ -58,7 +58,7 @@
     <div class="fish-item">
       <input type="checkbox" id="kolambi" name="fish" value="Kolambi" data-price="650">
       <label for="kolambi">Kolambi – ₹650/kg</label>
-      <input type="number" min="1" placeholder="qty" id="qty-kolambi">
+      <input type="number" min="1" id="qty-kolambi">
       <select class="unit" id="unit-kolambi">
         <option value="kg">kg</option>
         <option value="g">g</option>
@@ -68,7 +68,7 @@
     <div class="fish-item">
       <input type="checkbox" id="bombil" name="fish" value="Bombil" data-price="200">
       <label for="bombil">Bombil – ₹200/kg</label>
-      <input type="number" min="1" placeholder="qty" id="qty-bombil">
+      <input type="number" min="1" id="qty-bombil">
       <select class="unit" id="unit-bombil">
         <option value="kg">kg</option>
         <option value="g">g</option>
@@ -78,7 +78,7 @@
     <div class="fish-item">
       <input type="checkbox" id="bangda" name="fish" value="Bangda" data-price="300">
       <label for="bangda">Bangda – ₹300/kg</label>
-      <input type="number" min="1" placeholder="qty" id="qty-bangda">
+      <input type="number" min="1" id="qty-bangda">
       <select class="unit" id="unit-bangda">
         <option value="kg">kg</option>
         <option value="g">g</option>
@@ -102,13 +102,13 @@
         const qtyInput = document.getElementById("qty-" + name.toLowerCase());
         const unitSelect = document.getElementById("unit-" + name.toLowerCase());
 
-        const rawQty = parseFloat(qtyInput.value);
-        const unit = unitSelect.value;
+        let rawQty = parseFloat(qtyInput.value);
+        let unit = unitSelect.value;
 
-        if (!rawQty || rawQty <= 0) return;
+        if (isNaN(rawQty) || rawQty <= 0) return;
 
         let qtyInKg = unit === "g" ? rawQty / 1000 : rawQty;
-        const subtotal = price * qtyInKg;
+        let subtotal = price * qtyInKg;
         total += subtotal;
 
         message += `${rawQty}${unit} of ${name} = ₹${subtotal.toFixed(2)}\n`;
