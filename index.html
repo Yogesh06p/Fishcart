@@ -1,122 +1,155 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Fishcart - Order Fresh Fish</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f4fcff;
-      padding: 20px;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f1f3f6;
+      margin: 0;
+      padding: 0;
+    }
+    .top-msg {
+      background-color: #ffe500;
+      color: #000;
       text-align: center;
+      padding: 10px;
+      font-weight: bold;
     }
-
-    h1 {
-      color: #0077cc;
+    header {
+      background-color: #2874f0;
+      padding: 15px 20px;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
     }
-
-    .fish-item {
-      margin: 10px 0;
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 20px;
     }
-
-    .btn {
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      margin: 15px;
+      padding: 20px;
+      width: 280px;
+      text-align: left;
+    }
+    .card h3 {
+      margin-top: 0;
+    }
+    .card input[type="number"],
+    .card select {
+      margin-top: 5px;
+      padding: 5px;
+      width: 80px;
+    }
+    .order-btn {
+      display: block;
+      width: 200px;
+      margin: 30px auto;
+      padding: 15px;
       background-color: #28a745;
       color: white;
-      padding: 10px 20px;
+      text-align: center;
       text-decoration: none;
+      font-weight: bold;
+      border-radius: 6px;
+    }
+    .price-tag {
+      background-color: #ff6161;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 14px;
+      float: right;
+    }
+    .address-box {
+      margin: 20px auto;
+      text-align: center;
+    }
+    .address-box input {
+      width: 80%;
+      padding: 10px;
       border-radius: 5px;
-      display: inline-block;
-      margin-top: 20px;
-    }
-
-    input[type="number"] {
-      width: 60px;
-      margin-left: 10px;
-    }
-
-    select.unit {
-      margin-left: 5px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 <body>
 
-  <h1>Fishcart – Order Fresh Fish</h1>
-  <p>Select fish and enter quantity (gram or kg):</p>
+  <div class="top-msg">Fresh Fish Available – Fast Home Delivery in Your Area!</div>
+  <header>Fishcart</header>
 
-  <form id="fishForm">
-
-    <div class="fish-item">
-      <input type="checkbox" id="surmai" name="fish" value="Surmai" data-price="800">
-      <label for="surmai">Surmai – ₹800/kg</label>
+  <div class="container" id="fishForm">
+    <div class="card">
+      <h3>Surmai <span class="price-tag">₹800/kg</span></h3>
+      <input type="checkbox" id="surmai" value="Surmai" data-price="800">
       <input type="number" min="1" id="qty-surmai">
-      <select class="unit" id="unit-surmai">
-        <option value="kg">kg</option>
-        <option value="g">g</option>
-      </select>
+      <select id="unit-surmai"><option value="kg">kg</option><option value="g">g</option></select>
     </div>
 
-    <div class="fish-item">
-      <input type="checkbox" id="kolambi" name="fish" value="Kolambi" data-price="650">
-      <label for="kolambi">Kolambi – ₹650/kg</label>
+    <div class="card">
+      <h3>Kolambi <span class="price-tag">₹650/kg</span></h3>
+      <input type="checkbox" id="kolambi" value="Kolambi" data-price="650">
       <input type="number" min="1" id="qty-kolambi">
-      <select class="unit" id="unit-kolambi">
-        <option value="kg">kg</option>
-        <option value="g">g</option>
-      </select>
+      <select id="unit-kolambi"><option value="kg">kg</option><option value="g">g</option></select>
     </div>
 
-    <div class="fish-item">
-      <input type="checkbox" id="bombil" name="fish" value="Bombil" data-price="200">
-      <label for="bombil">Bombil – ₹200/kg</label>
+    <div class="card">
+      <h3>Bombil <span class="price-tag">₹200/kg</span></h3>
+      <input type="checkbox" id="bombil" value="Bombil" data-price="200">
       <input type="number" min="1" id="qty-bombil">
-      <select class="unit" id="unit-bombil">
-        <option value="kg">kg</option>
-        <option value="g">g</option>
-      </select>
+      <select id="unit-bombil"><option value="kg">kg</option><option value="g">g</option></select>
     </div>
 
-    <div class="fish-item">
-      <input type="checkbox" id="bangda" name="fish" value="Bangda" data-price="300">
-      <label for="bangda">Bangda – ₹300/kg</label>
+    <div class="card">
+      <h3>Bangda <span class="price-tag">₹300/kg</span></h3>
+      <input type="checkbox" id="bangda" value="Bangda" data-price="300">
       <input type="number" min="1" id="qty-bangda">
-      <select class="unit" id="unit-bangda">
-        <option value="kg">kg</option>
-        <option value="g">g</option>
-      </select>
+      <select id="unit-bangda"><option value="kg">kg</option><option value="g">g</option></select>
     </div>
+  </div>
 
-    <a id="orderBtn" class="btn" target="_blank">Order on WhatsApp</a>
-  </form>
+  <div class="address-box">
+    <input type="text" id="address" placeholder="Enter your delivery address here" />
+  </div>
+
+  <a class="order-btn" id="orderBtn" target="_blank">Order on WhatsApp</a>
 
   <script>
     document.getElementById("orderBtn").addEventListener("click", function () {
-      const selectedFish = document.querySelectorAll('input[name="fish"]:checked');
-      if (selectedFish.length === 0) return alert("Please select at least one fish.");
-
-      let message = "Hello, I would like to order:\n";
+      const fishes = ["surmai", "kolambi", "bombil", "bangda"];
+      let message = "Hello, I want to order:\\n";
       let total = 0;
 
-      selectedFish.forEach(fish => {
-        const name = fish.value;
-        const price = parseFloat(fish.getAttribute("data-price"));
-        const qtyInput = document.getElementById("qty-" + name.toLowerCase());
-        const unitSelect = document.getElementById("unit-" + name.toLowerCase());
+      fishes.forEach(fish => {
+        const checkbox = document.getElementById(fish);
+        const qty = parseFloat(document.getElementById("qty-" + fish).value);
+        const unit = document.getElementById("unit-" + fish).value;
+        const price = parseFloat(checkbox.getAttribute("data-price"));
 
-        let rawQty = parseFloat(qtyInput.value);
-        let unit = unitSelect.value;
-
-        if (isNaN(rawQty) || rawQty <= 0) return;
-
-        let qtyInKg = unit === "g" ? rawQty / 1000 : rawQty;
-        let subtotal = price * qtyInKg;
-        total += subtotal;
-
-        message += `${rawQty}${unit} of ${name} = ₹${subtotal.toFixed(2)}\n`;
+        if (checkbox.checked && !isNaN(qty)) {
+          const qtyInKg = unit === "g" ? qty / 1000 : qty;
+          const subtotal = qtyInKg * price;
+          total += subtotal;
+          message += `${qty}${unit} of ${checkbox.value} = ₹${subtotal.toFixed(2)}\\n`;
+        }
       });
 
-      message += `\nTotal Price: ₹${total.toFixed(2)}`;
-      const whatsappURL = `https://wa.me/919664239863?text=${encodeURIComponent(message)}`;
-      this.href = whatsappURL;
+      const address = document.getElementById("address").value.trim();
+      if (address) {
+        message += `\\nDelivery Address: ${address}`;
+      }
+
+      message += `\\nTotal: ₹${total.toFixed(2)}`;
+      const url = "https://wa.me/919664239863?text=" + encodeURIComponent(message);
+      this.href = url;
     });
   </script>
 
