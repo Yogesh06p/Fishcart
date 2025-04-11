@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Fishcart - Multiple Selection</title>
+  <title>Fishcart - Order Fresh Fish</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -32,37 +32,57 @@
       width: 60px;
       margin-left: 10px;
     }
+
+    select.unit {
+      margin-left: 5px;
+    }
   </style>
 </head>
 <body>
 
   <h1>Fishcart – Order Fresh Fish</h1>
-  <p>Select multiple fish and enter quantity for each:</p>
+  <p>Select fish and enter quantity in gram or kg:</p>
 
   <form id="fishForm">
 
     <div class="fish-item">
       <input type="checkbox" id="surmai" name="fish" value="Surmai" data-price="800">
       <label for="surmai">Surmai – ₹800/kg</label>
-      <input type="number" min="1" placeholder="kg" id="qty-surmai">
+      <input type="number" min="1" placeholder="qty" id="qty-surmai">
+      <select class="unit" id="unit-surmai">
+        <option value="kg">kg</option>
+        <option value="g">g</option>
+      </select>
     </div>
 
     <div class="fish-item">
       <input type="checkbox" id="kolambi" name="fish" value="Kolambi" data-price="650">
       <label for="kolambi">Kolambi – ₹650/kg</label>
-      <input type="number" min="1" placeholder="kg" id="qty-kolambi">
+      <input type="number" min="1" placeholder="qty" id="qty-kolambi">
+      <select class="unit" id="unit-kolambi">
+        <option value="kg">kg</option>
+        <option value="g">g</option>
+      </select>
     </div>
 
     <div class="fish-item">
       <input type="checkbox" id="bombil" name="fish" value="Bombil" data-price="200">
       <label for="bombil">Bombil – ₹200/kg</label>
-      <input type="number" min="1" placeholder="kg" id="qty-bombil">
+      <input type="number" min="1" placeholder="qty" id="qty-bombil">
+      <select class="unit" id="unit-bombil">
+        <option value="kg">kg</option>
+        <option value="g">g</option>
+      </select>
     </div>
 
     <div class="fish-item">
       <input type="checkbox" id="bangda" name="fish" value="Bangda" data-price="300">
       <label for="bangda">Bangda – ₹300/kg</label>
-      <input type="number" min="1" placeholder="kg" id="qty-bangda">
+      <input type="number" min="1" placeholder="qty" id="qty-bangda">
+      <select class="unit" id="unit-bangda">
+        <option value="kg">kg</option>
+        <option value="g">g</option>
+      </select>
     </div>
 
     <a id="orderBtn" class="btn" target="_blank">Order on WhatsApp</a>
@@ -78,19 +98,23 @@
 
       selectedFish.forEach(fish => {
         const name = fish.value;
-        const price = parseInt(fish.getAttribute("data-price"));
+        const price = parseFloat(fish.getAttribute("data-price"));
         const qtyInput = document.getElementById("qty-" + name.toLowerCase());
-        const qty = parseFloat(qtyInput.value);
+        const unitSelect = document.getElementById("unit-" + name.toLowerCase());
 
-        if (!qty || qty <= 0) return;
+        const rawQty = parseFloat(qtyInput.value);
+        const unit = unitSelect.value;
 
-        const subtotal = price * qty;
+        if (!rawQty || rawQty <= 0) return;
+
+        let qtyInKg = unit === "g" ? rawQty / 1000 : rawQty;
+        const subtotal = price * qtyInKg;
         total += subtotal;
 
-        message += `${qty} kg of ${name} – ₹${subtotal}\n`;
+        message += `${rawQty}${unit} of ${name} = ₹${subtotal.toFixed(2)}\n`;
       });
 
-      message += `\nTotal Price: ₹${total}`;
+      message += `\nTotal Price: ₹${total.toFixed(2)}`;
       const whatsappURL = `https://wa.me/919664239863?text=${encodeURIComponent(message)}`;
       this.href = whatsappURL;
     });
