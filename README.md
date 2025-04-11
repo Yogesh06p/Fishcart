@@ -39,7 +39,7 @@
     <img src="https://via.placeholder.com/100" alt="Surmai" />
     <h3>Surmai</h3>
     <p>₹800 / kg</p>
-    <a class="btn" href="https://wa.me/919999999999">Order on WhatsApp</a>
+    <a class="btn" href="https://wa.me/919664239863">Order on WhatsApp</a>
   </div>
 
   <div class="fish-item clearfix">
