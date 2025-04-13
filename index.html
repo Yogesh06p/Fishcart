@@ -24,6 +24,12 @@
       color: white;
       font-size: 24px;
       font-weight: bold;
+      display: flex;
+      align-items: center;
+    }
+    header img {
+      height: 40px;
+      margin-right: 10px;
     }
     .container {
       display: flex;
@@ -84,30 +90,32 @@
 <body>
 
   <div class="top-msg">Fresh Fish Available – Fast Home Delivery in Your Area!</div>
-  <header>Fishcart</header>
+  <header>
+    <img src="logo.png" alt="Fishcart Logo">
+    Fishcart
+  </header>
 
   <div class="container" id="fishForm">
+    <!-- All fish cards same as before -->
+    <!-- ...cards here... -->
     <div class="card">
       <h3>Surmai <span class="price-tag">₹800/kg</span></h3>
       <input type="checkbox" id="surmai" value="Surmai" data-price="800">
       <input type="number" min="1" id="qty-surmai">
       <select id="unit-surmai"><option value="kg">kg</option><option value="g">g</option></select>
     </div>
-
     <div class="card">
       <h3>Kolambi <span class="price-tag">₹650/kg</span></h3>
       <input type="checkbox" id="kolambi" value="Kolambi" data-price="650">
       <input type="number" min="1" id="qty-kolambi">
       <select id="unit-kolambi"><option value="kg">kg</option><option value="g">g</option></select>
     </div>
-
     <div class="card">
       <h3>Bombil <span class="price-tag">₹200/kg</span></h3>
       <input type="checkbox" id="bombil" value="Bombil" data-price="200">
       <input type="number" min="1" id="qty-bombil">
       <select id="unit-bombil"><option value="kg">kg</option><option value="g">g</option></select>
     </div>
-
     <div class="card">
       <h3>Bangda <span class="price-tag">₹300/kg</span></h3>
       <input type="checkbox" id="bangda" value="Bangda" data-price="300">
@@ -125,7 +133,7 @@
   <script>
     document.getElementById("orderBtn").addEventListener("click", function () {
       const fishes = ["surmai", "kolambi", "bombil", "bangda"];
-      let message = "Hello, I want to order:\\n";
+      let message = "Hello, I want to order:\n";
       let total = 0;
 
       fishes.forEach(fish => {
@@ -138,16 +146,16 @@
           const qtyInKg = unit === "g" ? qty / 1000 : qty;
           const subtotal = qtyInKg * price;
           total += subtotal;
-          message += `${qty}${unit} of ${checkbox.value} = ₹${subtotal.toFixed(2)}\\n`;
+          message += `${qty}${unit} of ${checkbox.value} = ₹${subtotal.toFixed(2)}\n`;
         }
       });
 
       const address = document.getElementById("address").value.trim();
       if (address) {
-        message += `\\nDelivery Address: ${address}`;
+        message += `\nDelivery Address: ${address}`;
       }
 
-      message += `\\nTotal: ₹${total.toFixed(2)}`;
+      message += `\nTotal: ₹${total.toFixed(2)}`;
       const url = "https://wa.me/919664239863?text=" + encodeURIComponent(message);
       this.href = url;
     });
