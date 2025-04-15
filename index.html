@@ -58,7 +58,7 @@
     .order-btn {
       display: block;
       width: 200px;
-      margin: 30px auto;
+      margin: 30px auto 10px;
       padding: 15px;
       background-color: #28a745;
       color: white;
@@ -85,18 +85,34 @@
       border-radius: 5px;
       border: 1px solid #ccc;
     }
+    .total-section {
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: green;
+      margin-top: 20px;
+    }
+    .trust-section {
+      background-color: #e6f9ff;
+      padding: 20px;
+      text-align: center;
+      border-radius: 10px;
+      margin: 30px 20px;
+    }
+    .trust-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      line-height: 1.8;
+    }
   </style>
 </head>
 <body>
 
   <div class="top-msg">Fresh Fish Available – Fast Home Delivery in Your Area!</div>
   <header>
-    <!-- Updated logo path here -->
- <img src="Logo/Logo2.gif" alt="Fishcart Logo" style="height: 80px; margin-right: 20px;">
-  Fishcart
-</header>
-  <!--   <img src="Logo/Logo1.PNG" alt="Fishcart Logo" style="width: 90px; height: auto">
-    Fishcart -->
+    <img src="Logo/Logo2.gif" alt="Fishcart Logo" style="height: 80px; margin-right: 20px;">
+    Fishcart
   </header>
 
   <div class="container" id="fishForm">
@@ -133,11 +149,50 @@
     <input type="text" id="address" placeholder="Enter your delivery address here" />
   </div>
 
+  <div class="total-section" id="total">Total: ₹0</div>
+
   <a class="order-btn" id="orderBtn" target="_blank">Order on WhatsApp</a>
 
+  <!-- TRUST POINTS SECTION -->
+  <div class="trust-section">
+    <h2>Why Choose Fishcart?</h2>
+    <ul>
+      <li>✓ Fresh & Cleaned Fish</li>
+      <li>✓ Fast Local Delivery</li>
+      <li>✓ Affordable Daily Prices</li>
+      <li>✓ Trusted by 500+ Families</li>
+      <li>✓ Easy WhatsApp Ordering</li>
+    </ul>
+  </div>
+
   <script>
+    const fishes = ["surmai", "kolambi", "bombil", "bangda"];
+    const totalDiv = document.getElementById("total");
+
+    function updateTotal() {
+      let total = 0;
+      fishes.forEach(fish => {
+        const checkbox = document.getElementById(fish);
+        const qty = parseFloat(document.getElementById("qty-" + fish).value);
+        const unit = document.getElementById("unit-" + fish).value;
+        const price = parseFloat(checkbox.getAttribute("data-price"));
+        if (checkbox.checked && !isNaN(qty)) {
+          const qtyInKg = unit === "g" ? qty / 1000 : qty;
+          total += qtyInKg * price;
+        }
+      });
+      totalDiv.textContent = `Total: ₹${total.toFixed(2)}`;
+      return total;
+    }
+
+    // Update total live when any input changes
+    fishes.forEach(fish => {
+      document.getElementById(fish).addEventListener("change", updateTotal);
+      document.getElementById("qty-" + fish).addEventListener("input", updateTotal);
+      document.getElementById("unit-" + fish).addEventListener("change", updateTotal);
+    });
+
     document.getElementById("orderBtn").addEventListener("click", function () {
-      const fishes = ["surmai", "kolambi", "bombil", "bangda"];
       let message = "Hello, I want to order:\n";
       let total = 0;
 
