@@ -120,6 +120,8 @@ const staffPass = "1234";
 let totalCash = parseFloat(localStorage.getItem("totalCash") || 0);
 let pendingOrders = JSON.parse(localStorage.getItem("pendingOrders") || "[]");
 let deliveredOrders = JSON.parse(localStorage.getItem("deliveredOrders") || "[]");
+let stockData = JSON.parse(localStorage.getItem("stockData") || '{"surmai": 10, "kolambi": 10, "bangda": 10, "bombil": 10}');
+let pendingStockData = JSON.parse(localStorage.getItem("pendingStockData") || '{"surmai": 0, "kolambi": 0, "bangda": 0, "bombil": 0}');
 
 function login() {
   const user = document.getElementById("username").value;
@@ -138,13 +140,13 @@ function login() {
 }
 
 function logout() {
-    document.getElementById("admin-panel").classList.add("hidden");
-    document.getElementById("staff-panel").classList.add("hidden");
-    document.getElementById("login").classList.remove("hidden");
-    document.getElementById("username").value = "";
-    document.getElementById("password").value = "";
-    alert("Logout successful!");
-  }
+  document.getElementById("admin-panel").classList.add("hidden");
+  document.getElementById("staff-panel").classList.add("hidden");
+  document.getElementById("login").classList.remove("hidden");
+  document.getElementById("username").value = "";
+  document.getElementById("password").value = "";
+  alert("Logout successful!");
+}
 
 function submitStaffOrder() {
   const fish = ["surmai", "kolambi", "bombil", "bangda"];
@@ -153,13 +155,21 @@ function submitStaffOrder() {
     if (document.getElementById(f).checked) {
       const qty = parseFloat(document.getElementById(`qty-${f}`).value);
       const unit = document.getElementById(`unit-${f}`).value;
-      if (qty) orderList.push(`${qty}${unit} ${capitalize(f)}`);
+      if (qty && stockData[f] >= qty) {
+        orderList.push({ name: capitalize(f), qty: qty, unit: unit });
+        stockData[f] -= qty;
+        pendingStockData[f] += qty;
+      } else if (qty && stockData[f] < qty) {
+        alert(`Not enough stock for ${f}`);
+      }
     }
   });
   if (orderList.length === 0) return alert("Select at least one fish.");
-  const order = orderList.join(", ");
+  const order = orderList.map(f => `${f.qty}${f.unit} ${f.name}`).join(", ");
   pendingOrders.push(order);
   localStorage.setItem("pendingOrders", JSON.stringify(pendingOrders));
+  localStorage.setItem("stockData", JSON.stringify(stockData));
+  localStorage.setItem("pendingStockData", JSON.stringify(pendingStockData));
   renderStaffData();
   renderAdminData();
   alert("Order submitted!");
@@ -182,18 +192,23 @@ function renderAdminData() {
   });
 
   document.getElementById("admin-total-cash").innerText = totalCash.toFixed(0);
+
+  Object.keys(pendingStockData).forEach(fish => {
+    document.getElementById(`pending-${fish}`).innerText = pendingStockData[fish];
+  });
 }
 
 function renderStaffData() {
   const pendingTable = document.getElementById("staff-pending-orders");
   pendingTable.innerHTML = "<tr><th>Order</th><th>Action</th></tr>";
-  pendingOrders.forEach((order, idx) => {
+  pendingOrders.forEach((order, index) => {
     const row = pendingTable.insertRow();
     row.insertCell(0).innerText = order;
-    const btn = document.createElement("button");
-    btn.innerText = "Mark as Delivered";
-    btn.onclick = () => markDelivered(idx);
-    row.insertCell(1).appendChild(btn);
+    const actionCell = row.insertCell(1);
+    const button = document.createElement("button");
+    button.innerText = "Mark as Delivered";
+    button.onclick = () => markDelivered(index);
+    actionCell.appendChild(button);
   });
 
   const deliveredTable = document.getElementById("staff-delivered-orders");
@@ -207,32 +222,26 @@ function renderStaffData() {
   document.getElementById("staff-total-cash").innerText = totalCash.toFixed(0);
 }
 
-function markDelivered(index) {
-  const order = pendingOrders[index];
-  const amt = calculateAmount(order);
-  deliveredOrders.push([order, amt]);
-  totalCash += amt;
-  pendingOrders.splice(index, 1);
-  localStorage.setItem("totalCash", totalCash);
+function markDelivered(orderIndex) {
+  const order = pendingOrders.splice(orderIndex, 1)[0];
+  deliveredOrders.push([order, 100]);
+  totalCash += 100;
+
+  // WhatsApp integration
+  const msg = `Delivery Done:\n${order}\nCash: ₹100`;
+  const waUrl = `https://wa.me/919967404633?text=${encodeURIComponent(msg)}`;
+  window.open(waUrl, '_blank');
+
   localStorage.setItem("pendingOrders", JSON.stringify(pendingOrders));
   localStorage.setItem("deliveredOrders", JSON.stringify(deliveredOrders));
+  localStorage.setItem("totalCash", totalCash);
   renderStaffData();
   renderAdminData();
-}
-
-function calculateAmount(order) {
-  let amt = 0;
-  if (order.includes("Surmai")) amt += 800;
-  if (order.includes("Kolambi")) amt += 650;
-  if (order.includes("Bombil")) amt += 200;
-  if (order.includes("Bangda")) amt += 300;
-  return amt;
 }
 
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 </script>
-
 </body>
 </html>
