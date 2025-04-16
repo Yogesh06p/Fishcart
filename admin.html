@@ -138,11 +138,13 @@ function login() {
 }
 
 function logout() {
-  localStorage.removeItem("totalCash");
-  localStorage.removeItem("pendingOrders");
-  localStorage.removeItem("deliveredOrders");
-  location.href = location.href.split('/').slice(0, -1).join('/') + "/"; // Login page redirect
-}
+    document.getElementById("admin-panel").classList.add("hidden");
+    document.getElementById("staff-panel").classList.add("hidden");
+    document.getElementById("login").classList.remove("hidden");
+    document.getElementById("username").value = "";
+    document.getElementById("password").value = "";
+    alert("Logout successful!");
+  }
 
 function submitStaffOrder() {
   const fish = ["surmai", "kolambi", "bombil", "bangda"];
