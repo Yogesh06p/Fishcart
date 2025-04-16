@@ -94,6 +94,13 @@
     </div>
   </div>
   <button onclick="submitStaffOrder()">Submit Order</button>
+
+  <div class="section">
+    <h3>Pending Orders from Admin Panel</h3>
+    <table id="staff-pending-orders">
+      <tr><th>Order</th><th>Status</th></tr>
+    </table>
+  </div>
 </div>
 
 <script>
@@ -116,6 +123,7 @@
     } else if (user === staffUser && pass === staffPass) {
       document.getElementById("login").classList.add("hidden");
       document.getElementById("staff-panel").classList.remove("hidden");
+      loadStaffPendingOrders();
     } else {
       alert("Invalid login!");
     }
@@ -173,6 +181,19 @@
     updatePendingQuantity(order);
   }
 
+  function loadStaffPendingOrders() {
+    const staffTable = document.getElementById("staff-pending-orders");
+    const adminTable = document.getElementById("pending-orders");
+    for (let i = 1; i < adminTable.rows.length; i++) {
+      const order = adminTable.rows[i].cells[0].innerText;
+      const row = staffTable.insertRow();
+      const cell1 = row.insertCell(0);
+      const cell2 = row.insertCell(1);
+      cell1.innerText = order;
+      cell2.innerText = "Pending";
+    }
+  }
+
   function moveToDelivered(order) {
     const table = document.getElementById("delivered-orders");
     const row = table.insertRow();
@@ -195,70 +216,42 @@
     let total = 0;
     const items = order.split(",");
     items.forEach(item => {
-      const parts = item.trim().toLowerCase();
-      const match = parts.match(/([\d.]+)\s*(kg|g)\s*(.*)/);
-      if (match) {
-        let [_, amount, unit, name] = match;
-        let qty = parseFloat(amount);
-        if (unit === "g") qty = qty / 1000;
-        let fish = name.trim().replace(/\s/g, '').toLowerCase();
-        const pricePerKg = fishPrices[fish] || 0;
-        total += qty * pricePerKg;
-      }
+      const fish = item.split(" ")[1].toLowerCase();
+      const qty = parseFloat(item.split(" ")[0]);
+      const price = fishPrices[fish];
+      total += price * qty;
     });
-    return total.toFixed(0);
+    return total;
   }
 
   function updateStock(order) {
     const items = order.split(",");
     items.forEach(item => {
-      const match = item.trim().toLowerCase().match(/([\d.]+)\s*(kg|g)\s*(.*)/);
-      if (match) {
-        let [_, amount, unit, name] = match;
-        let qty = parseFloat(amount);
-        if (unit === "g") qty /= 1000;
-        const fish = name.trim().replace(/\s/g, '').toLowerCase();
-        const stockInput = document.getElementById(`stock-${fish}`);
-        if (stockInput) {
-          let current = parseFloat(stockInput.value) || 0;
-          current -= qty;
-          if (current < 0) current = 0;
-          stockInput.value = current.toFixed(2);
-          pendingQty[fish] -= qty;
-          if (pendingQty[fish] < 0) pendingQty[fish] = 0;
-          document.getElementById(`pending-${fish}`).innerText = pendingQty[fish].toFixed(2);
-        }
-      }
+      const fish = item.split(" ")[1].toLowerCase();
+      const qty = parseFloat(item.split(" ")[0]);
+      const stockId = `stock-${fish}`;
+      const currentStock = parseFloat(document.getElementById(stockId).value);
+      document.getElementById(stockId).value = currentStock - qty;
     });
   }
 
   function updatePendingQuantity(order) {
     const items = order.split(",");
     items.forEach(item => {
-      const match = item.trim().toLowerCase().match(/([\d.]+)\s*(kg|g)\s*(.*)/);
-      if (match) {
-        let [_, amount, unit, name] = match;
-        let qty = parseFloat(amount);
-        if (unit === "g") qty /= 1000;
-        const fish = name.trim().replace(/\s/g, '').toLowerCase();
-        pendingQty[fish] += qty;
-        document.getElementById(`pending-${fish}`).innerText = pendingQty[fish].toFixed(2);
-      }
+      const fish = item.split(" ")[1].toLowerCase();
+      const qty = parseFloat(item.split(" ")[0]);
+      pendingQty[fish] += qty;
+      document.getElementById(`pending-${fish}`).innerText = pendingQty[fish];
     });
   }
 
   function updateDeliveredQuantity(order) {
     const items = order.split(",");
     items.forEach(item => {
-      const match = item.trim().toLowerCase().match(/([\d.]+)\s*(kg|g)\s*(.*)/);
-      if (match) {
-        let [_, amount, unit, name] = match;
-        let qty = parseFloat(amount);
-        if (unit === "g") qty /= 1000;
-        const fish = name.trim().replace(/\s/g, '').toLowerCase();
-        deliveredQty[fish] += qty;
-        document.getElementById(`delivered-${fish}`).innerText = deliveredQty[fish].toFixed(2);
-      }
+      const fish = item.split(" ")[1].toLowerCase();
+      const qty = parseFloat(item.split(" ")[0]);
+      deliveredQty[fish] += qty;
+      document.getElementById(`delivered-${fish}`).innerText = deliveredQty[fish];
     });
   }
 
