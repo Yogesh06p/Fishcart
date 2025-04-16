@@ -45,17 +45,17 @@
 
   <div class="section">
     <h3>Pending Orders</h3>
-    <table id="pending-orders">
-      <tr><th>Order</th><th>Action</th></tr>
+    <table id="admin-pending-orders">
+      <tr><th>Order</th></tr>
     </table>
   </div>
 
   <div class="section">
     <h3>Delivered Orders</h3>
-    <table id="delivered-orders">
+    <table id="admin-delivered-orders">
       <tr><th>Order</th><th>Cash Received (₹)</th></tr>
     </table>
-    <p><strong>Total Cash Received: ₹<span id="total-cash">0</span></strong></p>
+    <p><strong>Total Cash Received: ₹<span id="admin-total-cash">0</span></strong></p>
   </div>
 </div>
 
@@ -96,168 +96,140 @@
   <button onclick="submitStaffOrder()">Submit Order</button>
 
   <div class="section">
-    <h3>Pending Orders from Admin Panel</h3>
+    <h3>Pending Orders</h3>
     <table id="staff-pending-orders">
-      <tr><th>Order</th><th>Status</th></tr>
+      <tr><th>Order</th><th>Action</th></tr>
     </table>
+  </div>
+
+  <div class="section">
+    <h3>Delivered Orders</h3>
+    <table id="staff-delivered-orders">
+      <tr><th>Order</th><th>Cash Received (₹)</th></tr>
+    </table>
+    <p><strong>Total Cash Received: ₹<span id="staff-total-cash">0</span></strong></p>
   </div>
 </div>
 
 <script>
-  const validUser = "Fishcart";
-  const validPass = "admin";
-  const staffUser = "staff";
-  const staffPass = "1234";
+const adminUser = "Fishcart";
+const adminPass = "admin";
+const staffUser = "staff";
+const staffPass = "1234";
 
-  const fishPrices = { surmai: 800, kolambi: 650, bombil: 200, bangda: 300 };
-  const pendingQty = { surmai: 0, kolambi: 0, bangda: 0, bombil: 0 };
-  const deliveredQty = { surmai: 0, kolambi: 0, bangda: 0, bombil: 0 };
-  let totalCash = 0;
+let totalCash = parseFloat(localStorage.getItem("totalCash") || 0);
+let pendingOrders = JSON.parse(localStorage.getItem("pendingOrders") || "[]");
+let deliveredOrders = JSON.parse(localStorage.getItem("deliveredOrders") || "[]");
 
-  function login() {
-    const user = document.getElementById("username").value;
-    const pass = document.getElementById("password").value;
-    if (user === validUser && pass === validPass) {
-      document.getElementById("login").classList.add("hidden");
-      document.getElementById("admin-panel").classList.remove("hidden");
-    } else if (user === staffUser && pass === staffPass) {
-      document.getElementById("login").classList.add("hidden");
-      document.getElementById("staff-panel").classList.remove("hidden");
-      loadStaffPendingOrders();
-    } else {
-      alert("Invalid login!");
+function login() {
+  const user = document.getElementById("username").value;
+  const pass = document.getElementById("password").value;
+  if (user === adminUser && pass === adminPass) {
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("admin-panel").classList.remove("hidden");
+    renderAdminData();
+  } else if (user === staffUser && pass === staffPass) {
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("staff-panel").classList.remove("hidden");
+    renderStaffData();
+  } else {
+    alert("Invalid login!");
+  }
+}
+
+function logout() {
+  localStorage.removeItem("totalCash");
+  localStorage.removeItem("pendingOrders");
+  localStorage.removeItem("deliveredOrders");
+  location.href = location.href.split('/').slice(0, -1).join('/') + "/"; // Login page redirect
+}
+
+function submitStaffOrder() {
+  const fish = ["surmai", "kolambi", "bombil", "bangda"];
+  let orderList = [];
+  fish.forEach(f => {
+    if (document.getElementById(f).checked) {
+      const qty = parseFloat(document.getElementById(`qty-${f}`).value);
+      const unit = document.getElementById(`unit-${f}`).value;
+      if (qty) orderList.push(`${qty}${unit} ${capitalize(f)}`);
     }
-  }
+  });
+  if (orderList.length === 0) return alert("Select at least one fish.");
+  const order = orderList.join(", ");
+  pendingOrders.push(order);
+  localStorage.setItem("pendingOrders", JSON.stringify(pendingOrders));
+  renderStaffData();
+  renderAdminData();
+  alert("Order submitted!");
+}
 
-  function logout() {
-    document.getElementById("admin-panel").classList.add("hidden");
-    document.getElementById("staff-panel").classList.add("hidden");
-    document.getElementById("login").classList.remove("hidden");
-    document.getElementById("username").value = "";
-    document.getElementById("password").value = "";
-    alert("Logout successful!");
-  }
+function renderAdminData() {
+  const pendingTable = document.getElementById("admin-pending-orders");
+  pendingTable.innerHTML = "<tr><th>Order</th></tr>";
+  pendingOrders.forEach(order => {
+    const row = pendingTable.insertRow();
+    row.insertCell(0).innerText = order;
+  });
 
-  function submitStaffOrder() {
-    const fishes = ["surmai", "kolambi", "bombil", "bangda"];
-    let order = [];
-    fishes.forEach(fish => {
-      if (document.getElementById(fish).checked) {
-        let qty = parseFloat(document.getElementById(`qty-${fish}`).value);
-        let unit = document.getElementById(`unit-${fish}`).value;
-        if (qty > 0) {
-          order.push(`${qty}${unit} ${capitalize(fish)}`);
-        }
-      }
-    });
+  const deliveredTable = document.getElementById("admin-delivered-orders");
+  deliveredTable.innerHTML = "<tr><th>Order</th><th>Cash Received (₹)</th></tr>";
+  deliveredOrders.forEach(([order, amt]) => {
+    const row = deliveredTable.insertRow();
+    row.insertCell(0).innerText = order;
+    row.insertCell(1).innerText = `₹${amt}`;
+  });
 
-    if (order.length === 0) {
-      alert("Please select at least one fish.");
-      return;
-    }
+  document.getElementById("admin-total-cash").innerText = totalCash.toFixed(0);
+}
 
-    const orderStr = order.join(", ");
-    addPendingOrder(orderStr);
-    alert("Order submitted to admin panel!");
-    document.querySelectorAll('#fishForm input[type="checkbox"]').forEach(cb => cb.checked = false);
-    document.querySelectorAll('#fishForm input[type="number"]').forEach(input => input.value = '');
-  }
-
-  function addPendingOrder(order) {
-    const table = document.getElementById("pending-orders");
-    const row = table.insertRow();
-    const cell1 = row.insertCell(0);
-    const cell2 = row.insertCell(1);
-    const total = calculatePrice(order);
-    cell1.innerText = `${order} — ₹${total}`;
+function renderStaffData() {
+  const pendingTable = document.getElementById("staff-pending-orders");
+  pendingTable.innerHTML = "<tr><th>Order</th><th>Action</th></tr>";
+  pendingOrders.forEach((order, idx) => {
+    const row = pendingTable.insertRow();
+    row.insertCell(0).innerText = order;
     const btn = document.createElement("button");
     btn.innerText = "Mark as Delivered";
-    btn.onclick = function () {
-      moveToDelivered(order);
-      table.deleteRow(row.rowIndex);
-      updateStock(order);
-    };
-    cell2.appendChild(btn);
-    updatePendingQuantity(order);
-  }
+    btn.onclick = () => markDelivered(idx);
+    row.insertCell(1).appendChild(btn);
+  });
 
-  function loadStaffPendingOrders() {
-    const staffTable = document.getElementById("staff-pending-orders");
-    const adminTable = document.getElementById("pending-orders");
-    for (let i = 1; i < adminTable.rows.length; i++) {
-      const order = adminTable.rows[i].cells[0].innerText;
-      const row = staffTable.insertRow();
-      const cell1 = row.insertCell(0);
-      const cell2 = row.insertCell(1);
-      cell1.innerText = order;
-      cell2.innerText = "Pending";
-    }
-  }
+  const deliveredTable = document.getElementById("staff-delivered-orders");
+  deliveredTable.innerHTML = "<tr><th>Order</th><th>Cash Received (₹)</th></tr>";
+  deliveredOrders.forEach(([order, amt]) => {
+    const row = deliveredTable.insertRow();
+    row.insertCell(0).innerText = order;
+    row.insertCell(1).innerText = `₹${amt}`;
+  });
 
-  function moveToDelivered(order) {
-    const table = document.getElementById("delivered-orders");
-    const row = table.insertRow();
-    const cell1 = row.insertCell(0);
-    const cell2 = row.insertCell(1);
-    const total = calculatePrice(order);
-    cell1.innerText = order;
-    cell2.innerText = `₹${total}`;
-    totalCash += parseFloat(total);
-    document.getElementById("total-cash").innerText = totalCash.toFixed(0);
-    updateDeliveredQuantity(order);
+  document.getElementById("staff-total-cash").innerText = totalCash.toFixed(0);
+}
 
-    // WhatsApp message
-    const msg = `Delivery Confirmed:\n${order}\nTotal: ₹${total}`;
-    const whatsappURL = `https://wa.me/919967404633?text=${encodeURIComponent(msg)}`;
-    window.open(whatsappURL, '_blank');
-  }
+function markDelivered(index) {
+  const order = pendingOrders[index];
+  const amt = calculateAmount(order);
+  deliveredOrders.push([order, amt]);
+  totalCash += amt;
+  pendingOrders.splice(index, 1);
+  localStorage.setItem("totalCash", totalCash);
+  localStorage.setItem("pendingOrders", JSON.stringify(pendingOrders));
+  localStorage.setItem("deliveredOrders", JSON.stringify(deliveredOrders));
+  renderStaffData();
+  renderAdminData();
+}
 
-  function calculatePrice(order) {
-    let total = 0;
-    const items = order.split(",");
-    items.forEach(item => {
-      const fish = item.split(" ")[1].toLowerCase();
-      const qty = parseFloat(item.split(" ")[0]);
-      const price = fishPrices[fish];
-      total += price * qty;
-    });
-    return total;
-  }
+function calculateAmount(order) {
+  let amt = 0;
+  if (order.includes("Surmai")) amt += 800;
+  if (order.includes("Kolambi")) amt += 650;
+  if (order.includes("Bombil")) amt += 200;
+  if (order.includes("Bangda")) amt += 300;
+  return amt;
+}
 
-  function updateStock(order) {
-    const items = order.split(",");
-    items.forEach(item => {
-      const fish = item.split(" ")[1].toLowerCase();
-      const qty = parseFloat(item.split(" ")[0]);
-      const stockId = `stock-${fish}`;
-      const currentStock = parseFloat(document.getElementById(stockId).value);
-      document.getElementById(stockId).value = currentStock - qty;
-    });
-  }
-
-  function updatePendingQuantity(order) {
-    const items = order.split(",");
-    items.forEach(item => {
-      const fish = item.split(" ")[1].toLowerCase();
-      const qty = parseFloat(item.split(" ")[0]);
-      pendingQty[fish] += qty;
-      document.getElementById(`pending-${fish}`).innerText = pendingQty[fish];
-    });
-  }
-
-  function updateDeliveredQuantity(order) {
-    const items = order.split(",");
-    items.forEach(item => {
-      const fish = item.split(" ")[1].toLowerCase();
-      const qty = parseFloat(item.split(" ")[0]);
-      deliveredQty[fish] += qty;
-      document.getElementById(`delivered-${fish}`).innerText = deliveredQty[fish];
-    });
-  }
-
-  function capitalize(word) {
-    return word.charAt(0).toUpperCase() + word.slice(1);
-  }
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
 </script>
 
 </body>
